@@ -46,7 +46,7 @@ class TimeRecorder(Thread):
             self._Thread__stop()
 
 
-class PomodroidoCommand(sublime_plugin.TextCommand):
+class PomodoroCommand(sublime_plugin.TextCommand):
     _timeRecorder_thread = None
 
     def run(self, edit, workingMins, restingMins):
