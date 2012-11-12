@@ -2,8 +2,8 @@
 	"schema_version": "1.2",
 	"packages": [
 		{
-			"name": "Pomodroido Sublime Plugin",
-			"description": "It's a sublime plugin offer pomodroido function, to help you work more efficiently.",
+			"name": "Pomodoro Sublime Plugin",
+			"description": "It's a sublime plugin offer pomodoro function, to help you work more efficiently.",
 			"author": "fbird <neway_liuwei@yahoo.cn>",
 			"homepage": "https://github.com/fbird/Pomodroido-Sublime-Plugin",
 			"last_modified": "2012-10-25 23:18:12",
