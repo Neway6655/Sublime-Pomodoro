@@ -5,13 +5,13 @@
 			"name": "Pomodoro Sublime Plugin",
 			"description": "It's a sublime plugin offer pomodoro function, to help you work more efficiently.",
 			"author": "fbird <neway_liuwei@yahoo.cn>",
-			"homepage": "https://github.com/fbird/Pomodroido-Sublime-Plugin",
+			"homepage": "https://github.com/fbird/Sublime-Pomodoro",
 			"last_modified": "2012-10-25 23:18:12",
 			"platforms": {
 				"*": [
 					{
 						"version": "1.0.0",
-						"url": "https://nodeload.github.com/fbird/Pomodroido-Sublime-Plugin/zipball/v1"
+						"url": "https://nodeload.github.com/fbird/Sublime-Pomodoro/zipball/v1"
 					}
 				]
 			}
