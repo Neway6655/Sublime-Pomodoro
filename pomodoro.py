@@ -5,12 +5,23 @@ import functools
 import time
 
 
-def updateWorkingTimeStatus(leftMins):
-    sublime.status_message('Working time remaining: ' + str(leftMins) + 'mins')
+def drawProgressbar(tot, curr, start, end, back, pos):
+    s = start
+    for c in range(1, curr - 1):
+        s = s + back
+    s = s + pos
+    for c in range(curr, tot):
+        s = s + back
+    s = s + end
+    return s
 
 
-def updateRestingTimeStatus(leftMins):
-    sublime.status_message('Resting time remaining: ' + str(leftMins) + 'mins')
+def updateWorkingTimeStatus(totMins, leftMins):
+    sublime.status_message('Working time remaining: ' + str(leftMins) + 'mins ' + drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O'))
+
+
+def updateRestingTimeStatus(totMins, leftMins):
+    sublime.status_message('Resting time remaining: ' + str(leftMins) + 'mins ' + drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O'))
 
 
 class TimeRecorder(Thread):
@@ -24,7 +35,7 @@ class TimeRecorder(Thread):
         leftMins = runningMins
         while leftMins > 0:
             for i in range(1, 12):
-                sublime.set_timeout(functools.partial(displayCallback, leftMins), 10)
+                sublime.set_timeout(functools.partial(displayCallback, runningMins, leftMins), 10)
                 time.sleep(5)
             leftMins = leftMins - 1
 
