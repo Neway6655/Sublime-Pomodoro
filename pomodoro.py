@@ -5,14 +5,14 @@ import functools
 import time
 
 
-def drawProgressbar(tot, curr, start, end, back, pos):
-    s = start
-    for c in range(1, curr - 1):
-        s = s + back
-    s = s + pos
-    for c in range(curr, tot):
-        s = s + back
-    s = s + end
+def drawProgressbar(totalSize, currPos, charStartBar, charEndBar, charBackground, charPos):
+    s = charStartBar
+    for c in range(1, currPos - 1):
+        s = s + charBackground
+    s = s + charPos
+    for c in range(currPos, totalSize):
+        s = s + charBackground
+    s = s + charEndBar
     return s
 
 
