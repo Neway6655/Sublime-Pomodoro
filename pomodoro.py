@@ -33,7 +33,13 @@ class TimeRecorder(Thread):
 
     def recording(self, runningMins, displayCallback):
         leftMins = runningMins
-        while leftMins > 0:
+        while leftMins > 1:
+            for i in range(1, 60):
+                sublime.set_timeout(functools.partial(displayCallback, runningMins, leftMins), 10)
+                time.sleep(1)
+            leftMins = leftMins - 1
+
+        if leftMins == 1:
             for i in range(1, 12):
                 sublime.set_timeout(functools.partial(displayCallback, runningMins, leftMins), 10)
                 time.sleep(5)
