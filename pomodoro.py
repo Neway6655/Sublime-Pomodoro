@@ -1,9 +1,10 @@
 import sublime
 import sublime_plugin
-from threading import Thread
+import threading
 import functools
 import time
 
+timeRecorder_thread = None
 
 def drawProgressbar(totalSize, currPos, charStartBar, charEndBar, charBackground, charPos):
     s = charStartBar
@@ -24,12 +25,13 @@ def updateRestingTimeStatus(totMins, leftMins):
     sublime.status_message('Resting time remaining: ' + str(leftMins) + 'mins ' + drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O'))
 
 
-class TimeRecorder(Thread):
+class TimeRecorder(threading.Thread):
     def __init__(self, view, workingMins, restingMins):
+        super(TimeRecorder, self).__init__()
         self.view = view
         self.workingMins = workingMins
         self.restingMins = restingMins
-        Thread.__init__(self)
+        self.stopFlag = False
 
     def recording(self, runningMins, displayCallback):
         leftMins = runningMins
@@ -58,22 +60,21 @@ class TimeRecorder(Thread):
         self.stop()
 
     def stop(self):
-        if self.isAlive():
-            self._Thread__stop()
+        self.stopFlag = True
+
+    def stopped(self):
+        return self.stopFlag
 
 
 class PomodoroCommand(sublime_plugin.TextCommand):
-    _timeRecorder_thread = None
 
     def run(self, edit, workingMins, restingMins):
-        if (self._timeRecorder_thread is not None):
-            self._timeRecorder_thread.stop()
-
-        self._timeRecorder_thread = TimeRecorder(self.view, workingMins, restingMins)
-        self._timeRecorder_thread.start()
-
-    def is_enabled(self):
-        if self._timeRecorder_thread is None or not self._timeRecorder_thread.isAlive():
-            return True
+        global timeRecorder_thread
+        if (timeRecorder_thread is None): 
+            timeRecorder_thread = TimeRecorder(self.view, workingMins, restingMins)
+            timeRecorder_thread.start()
         else:
-            return False
+            if (timeRecorder_thread.stopped()):
+                timeRecorder_thread.join()
+                timeRecorder_thread = TimeRecorder(self.view, workingMins, restingMins)
+                timeRecorder_thread.start()
