@@ -18,8 +18,8 @@ Preview:
 -----------------------------
 *working progress*:
 
-![](https://raw2.github.com/Neway6655/Sublime-Pomodoro/master/images/pomodoro_working_status_sample.jpg)
+![](https://raw.githubusercontent.com/Neway6655/Sublime-Pomodoro/master/images/pomodoro_rest_status_sample.jpg)
 
 *taking a break*:
 
-![](https://raw2.github.com/Neway6655/Sublime-Pomodoro/master/images/pomodoro_rest_status_sample.jpg)
+![](https://raw.githubusercontent.com/Neway6655/Sublime-Pomodoro/master/images/pomodoro_working_status_sample.jpg)
