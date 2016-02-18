@@ -1,5 +1,9 @@
-> Expected behavior and actual behavior.
+* Issue description:
 
-> Steps to reproduce the problem.
+* Expected behavior and actual behavior:
 
-> Specifications like the operating system, and sublime version.
+* Steps to reproduce the problem:
+
+* Specifications like the operating system, and sublime version:
+
+* Other comments:
