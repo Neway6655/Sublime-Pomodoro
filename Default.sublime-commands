@@ -4,7 +4,7 @@
         "command": "pomodoro",
         "args":
      			{
-        			"workingMins": 30,
+        			"workingMins": 25,
     				"restingMins": 5
     			}
     }
