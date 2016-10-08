@@ -1,6 +1,11 @@
 [
     {
-        "caption": "pomodoro",
-        "command": "pomodoro"
+        "caption": "Pomodoro: Run Pomodoro",
+        "command": "pomodoro",
+        "args":
+     			{
+        			"workingMins": 25,
+    				"restingMins": 5
+    			}
     }
 ]
