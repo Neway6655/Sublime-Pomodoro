@@ -80,7 +80,7 @@ class TimeRecorder(threading.Thread):
                     continue
                 work = sublime.ok_cancel_dialog("Come on, let's continue.", 'OK')
                 if not work:
-                    stop()
+                    self.stop()
             time.sleep(2)
 
     def stop(self):
