@@ -3,7 +3,20 @@ import sublime_plugin
 import threading
 import functools
 import time
+import platform
 
+os = str(platform.system())
+
+try:
+    from SubNotify.sub_notify import SubNotifyIsReadyCommand as Notify
+except Exception:
+    class Notify(object):
+        """Notify fallback."""
+
+        @classmethod
+        def is_ready(cls):
+            """Return false to effectively disable SubNotify."""
+            return False
 timeRecorder_thread = None
 
 def drawProgressbar(totalSize, currPos, charStartBar, charEndBar, charBackground, charPos):
@@ -71,14 +84,24 @@ class TimeRecorder(threading.Thread):
                 time.sleep(2)
                 continue
 
-            rest = sublime.ok_cancel_dialog('Hey, you are working too hard, take a rest.', 'OK')
+            if Notify.is_ready() and os == "Windows":
+                sublime.run_command("sub_notify", {"title": "Pomodoro Tips", "msg": "Hey, you are working too hard, take a rest."})
+                rest = True
+            else:
+                rest = sublime.ok_cancel_dialog('Hey, you are working too hard, take a rest.', 'OK')
+
             if rest:
                 self.recording(self.restingMins, updateRestingTimeStatus)
                 if self.stopped():
                     stopRecording()
                     time.sleep(2)
                     continue
-                work = sublime.ok_cancel_dialog("Come on, let's continue.", 'OK')
+                if Notify.is_ready() and os == "Windows":
+                    sublime.run_command("sub_notify", {"title": "Pomodoro Tips", "msg": "Come on, let's continue."})
+                    work = True
+                else:
+                    work = sublime.ok_cancel_dialog("Come on, let's continue.", 'OK')
+                    
                 if not work:
                     self.stop()
             time.sleep(2)
