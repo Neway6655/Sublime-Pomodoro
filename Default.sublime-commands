@@ -5,7 +5,9 @@
         "args":
      			{
         			"workingMins": 25,
-    				"restingMins": 5
+    				"restingMins": 5,
+    				"longBreakWorkingCount": 4,
+    				"longBreakMins": 15
     			}
     }
 ]

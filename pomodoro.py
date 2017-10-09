@@ -38,11 +38,13 @@ def stopRecording():
     sublime.status_message('')
 
 class TimeRecorder(threading.Thread):
-    def __init__(self, view, workingMins, restingMins):
+    def __init__(self, view, workingMins, restingMins, longBreakWorkingCount, longBreakMins):
         super(TimeRecorder, self).__init__()
         self.view = view
         self.workingMins = workingMins
         self.restingMins = restingMins
+        self.longBreakWorkingCount = longBreakWorkingCount
+        self.longBreakMins = longBreakMins
         self.stopFlag = threading.Event()
 
     def recording(self, runningMins, displayCallback):
@@ -67,7 +69,11 @@ class TimeRecorder(threading.Thread):
                 time.sleep(5)
             leftMins = leftMins - 1
 
+    def longBreak(self, workingSessionCount):
+        return workingSessionCount >= self.longBreakWorkingCount
+
     def run(self):
+        workingSessionCount = 0
         while 1:
             if self.stopped():
                 stopRecording()
@@ -86,8 +92,15 @@ class TimeRecorder(threading.Thread):
                 rest = True
             else:
                 rest = sublime.ok_cancel_dialog('Hey, you are working too hard, take a rest.', 'OK')
+            # increase work session count
+            workingSessionCount += 1
+
             if rest:
-                self.recording(self.restingMins, updateRestingTimeStatus)
+                restingMins = self.restingMins
+                if self.longBreak(workingSessionCount):
+                    restingMins = self.longBreakMins
+                    workingSessionCount = 0
+                self.recording(restingMins, updateRestingTimeStatus)
                 if self.stopped():
                     stopRecording()
                     time.sleep(2)
@@ -113,10 +126,10 @@ class TimeRecorder(threading.Thread):
 
 class PomodoroCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, workingMins, restingMins):
+    def run(self, edit, workingMins, restingMins, longBreakWorkingCount, longBreakMins):
         global timeRecorder_thread
         if timeRecorder_thread is None: 
-            timeRecorder_thread = TimeRecorder(self.view, workingMins, restingMins)
+            timeRecorder_thread = TimeRecorder(self.view, workingMins, restingMins, longBreakWorkingCount, longBreakMins)
             timeRecorder_thread.start()
         elif timeRecorder_thread.stopped():
             timeRecorder_thread.resume()
