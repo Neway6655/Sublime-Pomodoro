@@ -4,6 +4,8 @@ import threading
 import functools
 import time
 
+ST_VERSION = 3000 if sublime.version() == '' else int(sublime.version())
+
 try:
     from SubNotify.sub_notify import SubNotifyIsReadyCommand as Notify
 except Exception:
@@ -135,3 +137,22 @@ class PomodoroCommand(sublime_plugin.TextCommand):
             timeRecorder_thread.resume()
         else:
             timeRecorder_thread.stop()
+
+def load_settings():
+    s = sublime.load_settings("Pomodoro.sublime-settings")
+    autoStart = s.get("autoStart", False)
+    workingMins = s.get("workingMins", 25)
+    restingMins = s.get("restingMins", 5)
+    longBreakWorkingCount = s.get("longBreakWorkingCount", 4)
+    longBreakMins = s.get("longBreakMins", 15)
+    return autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins
+
+def plugin_loaded():
+    autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins = load_settings()
+    if autoStart:
+        sublime.active_window().run_command('pomodoro',{'workingMins': workingMins, "restingMins": restingMins, "longBreakWorkingCount": longBreakWorkingCount, "longBreakMins": longBreakMins})
+
+if ST_VERSION < 3000:
+    autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins = load_settings()
+    if autoStart:
+        sublime.active_window().run_command('pomodoro',{'workingMins': workingMins, "restingMins": restingMins, "longBreakWorkingCount": longBreakWorkingCount, "longBreakMins": longBreakMins})
