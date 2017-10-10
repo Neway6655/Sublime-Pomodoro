@@ -7,8 +7,7 @@
         			"workingMins": 25,
     				"restingMins": 5,
     				"longBreakWorkingCount": 4,
-    				"longBreakMins": 15,
-                    "autoStart": false
+    				"longBreakMins": 15
     			}
     }
 ]
