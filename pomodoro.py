@@ -18,6 +18,7 @@ except Exception:
             return False
 timeRecorder_thread = None
 
+
 def drawProgressbar(totalSize, currPos, charStartBar, charEndBar, charBackground, charPos):
     s = charStartBar
     for c in range(1, currPos - 1):
@@ -29,15 +30,30 @@ def drawProgressbar(totalSize, currPos, charStartBar, charEndBar, charBackground
     return s
 
 
-def updateWorkingTimeStatus(totMins, leftMins):
-    sublime.status_message('Working time remaining: ' + str(leftMins) + 'mins ' + drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O'))
+def updateWorkingTimeStatus(kwargs):
+    leftMins = kwargs.get('leftMins')
+    totMins = kwargs.get('runningMins')
+    current_pomodoro = kwargs.get('current_pomodoro')
+    total_pomodoros = kwargs.get('total_pomodoros')
+    sublime.status_message(
+        'Working time remaining: ' + str(leftMins) + 'mins | pomodoro: ' +
+        str(current_pomodoro + 1) + '/' + str(total_pomodoros) + ' ' +
+        drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O')
+    )
 
 
-def updateRestingTimeStatus(totMins, leftMins):
-    sublime.status_message('Resting time remaining: ' + str(leftMins) + 'mins ' + drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O'))
+def updateRestingTimeStatus(kwargs):
+    leftMins = kwargs.get('leftMins')
+    totMins = kwargs.get('runningMins')
+    sublime.status_message(
+        'Resting time remaining: ' + str(leftMins) + 'mins ' +
+        drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O')
+    )
+
 
 def stopRecording():
     sublime.status_message('')
+
 
 class TimeRecorder(threading.Thread):
     def __init__(self, view, workingMins, restingMins, longBreakWorkingCount, longBreakMins):
@@ -48,6 +64,7 @@ class TimeRecorder(threading.Thread):
         self.longBreakWorkingCount = longBreakWorkingCount
         self.longBreakMins = longBreakMins
         self.stopFlag = threading.Event()
+        self.workingSessionCount = 0
 
     def recording(self, runningMins, displayCallback):
         leftMins = runningMins
@@ -56,8 +73,13 @@ class TimeRecorder(threading.Thread):
                 if self.stopped():
                     stopRecording()
                     break
-
-                sublime.set_timeout(functools.partial(displayCallback, runningMins, leftMins), 10)
+                kwargs = {
+                    'runningMins': runningMins,
+                    'leftMins': leftMins,
+                    'current_pomodoro': self.workingSessionCount,
+                    'total_pomodoros': self.longBreakWorkingCount
+                }
+                sublime.set_timeout(functools.partial(displayCallback, kwargs), 10)
                 time.sleep(1)
             leftMins = leftMins - 1
 
@@ -66,8 +88,13 @@ class TimeRecorder(threading.Thread):
                 if self.stopped():
                     stopRecording()
                     break
-
-                sublime.set_timeout(functools.partial(displayCallback, runningMins, leftMins), 10)
+                kwargs = {
+                    'runningMins': runningMins,
+                    'leftMins': leftMins,
+                    'current_pomodoro': self.workingSessionCount,
+                    'total_pomodoros': self.longBreakWorkingCount
+                }
+                sublime.set_timeout(functools.partial(displayCallback, kwargs), 10)
                 time.sleep(5)
             leftMins = leftMins - 1
 
@@ -75,7 +102,6 @@ class TimeRecorder(threading.Thread):
         return workingSessionCount >= self.longBreakWorkingCount
 
     def run(self):
-        workingSessionCount = 0
         while 1:
             if self.stopped():
                 stopRecording()
@@ -95,13 +121,13 @@ class TimeRecorder(threading.Thread):
             else:
                 rest = sublime.ok_cancel_dialog('Hey, you are working too hard, take a rest.', 'OK')
             # increase work session count
-            workingSessionCount += 1
+            self.workingSessionCount += 1
 
             if rest:
                 restingMins = self.restingMins
-                if self.longBreak(workingSessionCount):
+                if self.longBreak(self.workingSessionCount):
                     restingMins = self.longBreakMins
-                    workingSessionCount = 0
+                    self.workingSessionCount = 0
                 self.recording(restingMins, updateRestingTimeStatus)
                 if self.stopped():
                     stopRecording()
@@ -110,7 +136,7 @@ class TimeRecorder(threading.Thread):
                 if Notify.is_ready():
                     sublime.run_command("sub_notify", {"title": "", "msg": "Come on, let's continue."})
                     work = True
-                else:    
+                else:
                     work = sublime.ok_cancel_dialog("Come on, let's continue.", 'OK')
                 if not work:
                     self.stop()
@@ -124,19 +150,22 @@ class TimeRecorder(threading.Thread):
 
     def resume(self):
         self.stopFlag.clear()
-        
+
 
 class PomodoroCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, workingMins, restingMins, longBreakWorkingCount, longBreakMins):
         global timeRecorder_thread
-        if timeRecorder_thread is None: 
-            timeRecorder_thread = TimeRecorder(self.view, workingMins, restingMins, longBreakWorkingCount, longBreakMins)
+        if timeRecorder_thread is None:
+            timeRecorder_thread = TimeRecorder(
+                self.view, workingMins, restingMins, longBreakWorkingCount, longBreakMins
+            )
             timeRecorder_thread.start()
         elif timeRecorder_thread.stopped():
             timeRecorder_thread.resume()
         else:
             timeRecorder_thread.stop()
+
 
 def load_settings():
     s = sublime.load_settings("Pomodoro.sublime-settings")
@@ -147,12 +176,30 @@ def load_settings():
     longBreakMins = s.get("longBreakMins", 15)
     return autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins
 
+
 def plugin_loaded():
     autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins = load_settings()
     if autoStart:
-        sublime.active_window().run_command('pomodoro',{'workingMins': workingMins, "restingMins": restingMins, "longBreakWorkingCount": longBreakWorkingCount, "longBreakMins": longBreakMins})
+        sublime.active_window().run_command(
+            'pomodoro',
+            {
+                'workingMins': workingMins,
+                "restingMins": restingMins,
+                "longBreakWorkingCount": longBreakWorkingCount,
+                "longBreakMins": longBreakMins
+            }
+        )
+
 
 if ST_VERSION < 3000:
     autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins = load_settings()
     if autoStart:
-        sublime.active_window().run_command('pomodoro',{'workingMins': workingMins, "restingMins": restingMins, "longBreakWorkingCount": longBreakWorkingCount, "longBreakMins": longBreakMins})
+        sublime.active_window().run_command(
+            'pomodoro',
+            {
+                'workingMins': workingMins,
+                "restingMins": restingMins,
+                "longBreakWorkingCount": longBreakWorkingCount,
+                "longBreakMins": longBreakMins
+            }
+        )
