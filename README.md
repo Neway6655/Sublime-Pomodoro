@@ -6,9 +6,9 @@ This is a sublime plugin which implements functions like pomodoro.
 Usage: 
 -----------------------------
 Add the line below to your **"Preferences: Key Bindings - User"** settings:  
-{ "keys": ["ctrl+shift+alt+p"], "command": "pomodoro", "args": {"workingMins": 25, "restingMins": 5, "longBreakWorkingCount": 4, "longBreakMins": 15} }
+{ "keys": ["ctrl+shift+alt+p"], "command": "pomodoro" }
 
-Here are some arguments you can configure(all configurations have default values)
+In **"Preferences: Package Settings - Pomodoro - Settings-Default"** are some arguments you can configure(all configurations have default values). We recommend you copy these values and paste in **"Preferences: Package Settings - Pomodoro - Settings-User"**
 
 * workingMins: configure your working time in minutes. 
 * restingMins: configure your rest time in minutes.
