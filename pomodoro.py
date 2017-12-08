@@ -45,8 +45,11 @@ def updateWorkingTimeStatus(kwargs):
 def updateRestingTimeStatus(kwargs):
     leftMins = kwargs.get('leftMins')
     totMins = kwargs.get('runningMins')
+    current_pomodoro = kwargs.get('current_pomodoro')
+    total_pomodoros = kwargs.get('total_pomodoros')
     sublime.status_message(
-        'Resting time remaining: ' + str(leftMins) + 'mins ' +
+        'Resting time remaining: ' + str(leftMins) + 'mins ' + '| pomodoro: ' +
+        str(current_pomodoro) + '/' + str(total_pomodoros) + ' ' +
         drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O')
     )
 
@@ -154,8 +157,9 @@ class TimeRecorder(threading.Thread):
 
 class PomodoroCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, workingMins, restingMins, longBreakWorkingCount, longBreakMins):
+    def run(self, edit, **kwargs):
         global timeRecorder_thread
+        autoStart, workingMins, restingMins, longBreakWorkingCount, longBreakMins = load_settings()
         if timeRecorder_thread is None:
             timeRecorder_thread = TimeRecorder(
                 self.view, workingMins, restingMins, longBreakWorkingCount, longBreakMins
@@ -182,12 +186,6 @@ def plugin_loaded():
     if autoStart:
         sublime.active_window().run_command(
             'pomodoro',
-            {
-                'workingMins': workingMins,
-                "restingMins": restingMins,
-                "longBreakWorkingCount": longBreakWorkingCount,
-                "longBreakMins": longBreakMins
-            }
         )
 
 
