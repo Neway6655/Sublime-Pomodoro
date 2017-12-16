@@ -47,8 +47,11 @@ def updateRestingTimeStatus(kwargs):
     totMins = kwargs.get('runningMins')
     current_pomodoro = kwargs.get('current_pomodoro')
     total_pomodoros = kwargs.get('total_pomodoros')
+    if current_pomodoro == 0:
+        current_pomodoro = total_pomodoros
+
     sublime.status_message(
-        'Resting time remaining: ' + str(leftMins) + 'mins ' + '| pomodoro: ' +
+        'Resting time remaining: ' + str(leftMins) + 'mins ' + '| break: ' +
         str(current_pomodoro) + '/' + str(total_pomodoros) + ' ' +
         drawProgressbar(totMins, totMins - leftMins + 1, '[', ']', '-', 'O')
     )
