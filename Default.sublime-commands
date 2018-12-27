@@ -5,6 +5,6 @@
 	},
 	{
         "caption": "Pomodoro: Pause Pomodoro",
-        "command": "pause"
+        "command": "pomodoro_pause"
     }
 ]

@@ -7,7 +7,7 @@ Usage:
 -----------------------------
 Add the line below to your **"Preferences: Key Bindings - User"** settings:  
 { "keys": ["ctrl+shift+alt+p"], "command": "pomodoro" },   
-{ "keys": ["ctrl+shift+9"], "command": "pause" }
+{ "keys": ["ctrl+shift+9"], "command": "pomodoro_pause" }
 
 In **"Preferences: Package Settings - Pomodoro - Settings-Default"** are some arguments you can configure(all configurations have default values). We recommend you copy these values and paste in **"Preferences: Package Settings - Pomodoro - Settings-User"**
 

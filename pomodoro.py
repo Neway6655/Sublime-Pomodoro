@@ -190,7 +190,7 @@ class PomodoroCommand(sublime_plugin.TextCommand):
             timeRecorder_thread.stop()
 
 
-class PauseCommand(sublime_plugin.TextCommand):
+class PomodoroPauseCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, **kwargs):
         if timeRecorder_thread:
