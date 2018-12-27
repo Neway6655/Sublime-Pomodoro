@@ -61,6 +61,13 @@ def stopRecording():
     sublime.status_message('')
 
 
+def pauseRecording():
+    sublime.status_message('Pomodoro Paused ||')
+    time.sleep(1)
+    sublime.status_message('')
+    time.sleep(1)
+
+
 class TimeRecorder(threading.Thread):
     def __init__(self, view, workingMins, restingMins, longBreakWorkingCount, longBreakMins):
         super(TimeRecorder, self).__init__()
@@ -71,11 +78,15 @@ class TimeRecorder(threading.Thread):
         self.longBreakMins = longBreakMins
         self.stopFlag = threading.Event()
         self.workingSessionCount = 0
+        self.is_paused = False
 
     def recording(self, runningMins, displayCallback):
         leftMins = runningMins
         while leftMins > 1:
+
             for i in range(1, 60):
+                while self.is_paused:
+                    pauseRecording()
                 if self.stopped():
                     stopRecording()
                     break
@@ -91,6 +102,8 @@ class TimeRecorder(threading.Thread):
 
         if leftMins == 1:
             for i in range(1, 12):
+                while self.is_paused:
+                    pauseRecording()
                 if self.stopped():
                     stopRecording()
                     break
@@ -157,6 +170,9 @@ class TimeRecorder(threading.Thread):
     def resume(self):
         self.stopFlag.clear()
 
+    def pause(self):
+        self.is_paused = not self.is_paused
+
 
 class PomodoroCommand(sublime_plugin.TextCommand):
 
@@ -172,6 +188,13 @@ class PomodoroCommand(sublime_plugin.TextCommand):
             timeRecorder_thread.resume()
         else:
             timeRecorder_thread.stop()
+
+
+class PauseCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, **kwargs):
+        if timeRecorder_thread:
+            timeRecorder_thread.pause()
 
 
 def load_settings():
