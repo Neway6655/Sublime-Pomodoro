@@ -2,5 +2,9 @@
     {
         "caption": "Pomodoro: Run Pomodoro",
         "command": "pomodoro",
+	},
+	{
+        "caption": "Pomodoro: Pause Pomodoro",
+        "command": "pomodoro_pause"
     }
 ]
